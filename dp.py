@@ -24,13 +24,13 @@ USER_CASE_MODS = {} # {user_id: {'more_bonus': 0.0, 'less_bonus': 0.0}}
 
 # Структура токенов с начальными ценами и лимитами
 TOKENS_INFO = {
-    "btc": {"name": "Bitcoin", "price": 50000.0, "init_price": 50000.0, "min": 30000.0, "max": 150000.0},
-    "eth": {"name": "Ethereum", "price": 1500.0, "init_price": 1500.0, "min": 750.0, "max": 2500.0},
-    "sol": {"name": "Solana", "price": 75.0, "init_price": 75.0, "min": 50.0, "max": 150.0},
-    "ltc": {"name": "Litecoin", "price": 50.0, "init_price": 50.0, "min": 25.0, "max": 75.0},
-    "doge": {"name": "Dogecoin", "price": 0.1, "init_price": 0.1, "min": 0.1, "max": 0.5},
-    "gold": {"name": "Gold", "price": 4000.0, "init_price": 4000.0, "min": 3500.0, "max": 4500.0},
-    "silver": {"name": "Silver", "price": 100.0, "init_price": 100.0, "min": 75.0, "max": 125.0},
+    "btc": {"name": "₿Bitcoin", "price": 50000.0, "init_price": 50000.0, "min": 30000.0, "max": 100000.0},
+    "eth": {"name": "⟠Ethereum", "price": 1500.0, "init_price": 1500.0, "min": 1000.0, "max": 2000.0},
+    "sol": {"name": "🟣Solana", "price": 75.0, "init_price": 75.0, "min": 50.0, "max": 125.0},
+    "ltc": {"name": "𝑳Litecoin", "price": 50.0, "init_price": 50.0, "min": 30.0, "max": 70.0},
+    "doge": {"name": "🪙Dogecoin", "price": 0.1, "init_price": 0.1, "min": 0.1, "max": 0.25},
+    "gold": {"name": "🟡Gold", "price": 4000.0, "init_price": 4000.0, "min": 3750.0, "max": 4250.0},
+    "silver": {"name": "⚪Silver", "price": 100.0, "init_price": 100.0, "min": 75.0, "max": 125.0},
 }
 
 # Тренды рынка для динамической вероятности
@@ -38,11 +38,11 @@ TOKEN_TRENDS = {key: {'up_bonus': 0.0, 'down_bonus': 0.0} for key in TOKENS_INFO
 
 # --- КЕЙСЫ (Фиксированные призы) ---
 CASES_INFO = {
-    "wood": {"name": "Деревянный", "price": 1000.0, "prizes": [100, 250, 500, 750, 1000, 1250, 1500, 1750, 2500]},
-    "bronze": {"name": "Бронзовый", "price": 5000.0, "prizes": [250, 500, 1000, 1750, 2500, 5000, 5750, 6250, 7000, 7500]},
-    "silver": {"name": "Серебряный", "price": 10000.0, "prizes": [500, 1000, 1750, 2500, 5000, 5500, 6250, 7500, 10000, 11250, 12500, 13750, 15000]},
-    "gold": {"name": "Золотой", "price": 25000.0, "prizes": [5000, 6250, 7500, 10000, 12500, 15000, 16250, 17500, 20000, 25000, 27500, 30000, 32500, 35000, 37500, 40000]},
-    "summer": {"name": "Летний", "price": 50000.0, "prizes": [7500, 10000, 15000, 17500, 20000, 25000, 30000, 37500, 45000, 50000, 57500, 62500, 67500, 70000, 75000]},
+    "wood": {"name": "🌳Деревянный", "price": 1000.0, "prizes": [100, 250, 500, 750, 1000, 1250, 1500, 1750, 2500]},
+    "bronze": {"name": "🟤Бронзовый", "price": 5000.0, "prizes": [250, 500, 1000, 1750, 2500, 5000, 5750, 6250, 7000, 7500]},
+    "silver": {"name": "⚪Серебряный", "price": 10000.0, "prizes": [500, 1000, 1750, 2500, 5000, 5500, 6250, 7500, 10000, 11250, 12500, 13750, 15000]},
+    "gold": {"name": "🟡Золотой", "price": 25000.0, "prizes": [5000, 6250, 7500, 10000, 12500, 15000, 16250, 17500, 20000, 25000, 27500, 30000, 32500, 35000, 37500, 40000]},
+    "summer": {"name": "🏖️Летний", "price": 50000.0, "prizes": [7500, 10000, 15000, 17500, 20000, 25000, 30000, 37500, 45000, 50000, 57500, 62500, 67500, 70000, 75000]},
 }
 
 # --- СОСТОЯНИЯ FSM ---
@@ -141,12 +141,12 @@ async def init_user(user_id: int, username: str, full_name: str, db: aiosqlite.C
 def get_main_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="Курс токенов")],
-            [KeyboardButton(text="Купить"), KeyboardButton(text="Продать")],
-            [KeyboardButton(text="Кейсы")],
-            [KeyboardButton(text="Портфель"), KeyboardButton(text="Рейтинг")],
-            [KeyboardButton(text="Донат"), KeyboardButton(text="Поддержка")],
-            [KeyboardButton(text="Бонус"), KeyboardButton(text="Промокод")]
+            [KeyboardButton(text="📊Курс токенов")],
+            [KeyboardButton(text="📈Купить"), KeyboardButton(text="📉Продать")],
+            [KeyboardButton(text="💼Кейсы")],
+            [KeyboardButton(text="💰Баланс"), KeyboardButton(text="🏆Рейтинг")],
+            [KeyboardButton(text="💳Донат"), KeyboardButton(text="👨‍💻Поддержка")],
+            [KeyboardButton(text="🎁Бонус"), KeyboardButton(text="🎟️Промокод")]
         ],
         resize_keyboard=True
     )
@@ -352,14 +352,14 @@ async def cmd_start(message: Message):
         await init_user(message.from_user.id, message.from_user.username, message.from_user.full_name, db)
     await message.answer("Привет!", reply_markup=get_main_keyboard())
 
-@dp.message(F.text == "Курс токенов")
+@dp.message(F.text == "📊Курс токенов")
 async def show_rates(message: Message):
     text = "📈 <b>Текущий курс токенов (в PTK):</b>\n\n"
     for data in TOKENS_INFO.values():
         text += f"<b>{data['name']}</b>: {data['price']:.2f}\n"
     await message.answer(text, parse_mode="HTML")
 
-@dp.message(F.text == "Портфель")
+@dp.message(F.text == "💰Баланс")
 async def show_portfolio(message: Message):
     user_id = message.from_user.id
     text = "<b>Ваш баланс:</b>\n"
@@ -379,11 +379,11 @@ async def show_portfolio(message: Message):
             
     await message.answer(text, parse_mode="HTML")
 
-@dp.message(F.text == "Поддержка")
+@dp.message(F.text == "👨‍💻Поддержка")
 async def support(message: Message):
     await message.answer("Официальный ТГК бота - https://t.me/lavkapyatak")
 
-@dp.message(F.text == "Бонус")
+@dp.message(F.text == "🎁Бонус")
 async def get_bonus(message: Message):
     user_id = message.from_user.id
     now = time.time()
@@ -403,7 +403,7 @@ async def get_bonus(message: Message):
             minutes = int((time_left % 3600) // 60)
             await message.answer(f"⏳ Бонус уже был получен. Следующий бонус будет доступен через {hours} ч. {minutes} мин.")
 
-@dp.message(F.text == "Рейтинг")
+@dp.message(F.text == "🏆Рейтинг")
 async def show_rating(message: Message):
     async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute("SELECT user_id, balance, username, first_name FROM users") as cursor:
@@ -444,7 +444,7 @@ async def show_rating(message: Message):
     await message.answer(text, parse_mode="HTML")
 
 # --- ПРОМОКОДЫ ---
-@dp.message(F.text == "Промокод")
+@dp.message(F.text == "🎟️Промокод")
 async def promo_start(message: Message, state: FSMContext):
     await message.answer("Введите промокод:")
     await state.set_state(TradeState.waiting_for_promocode)
@@ -499,7 +499,7 @@ async def process_promocode(message: Message, state: FSMContext):
     await state.clear()
 
 # --- ПОКУПКА / ПРОДАЖА ТОКЕНОВ ---
-@dp.message(F.text == "Купить")
+@dp.message(F.text == "📈Купить")
 async def buy_start(message: Message):
     async with aiosqlite.connect(DB_PATH) as db:
         await init_user(message.from_user.id, message.from_user.username, message.from_user.full_name, db)
@@ -508,7 +508,7 @@ async def buy_start(message: Message):
         reply_markup=get_tokens_inline_keyboard("buy")
     )
 
-@dp.message(F.text == "Продать")
+@dp.message(F.text == "📉Продать")
 async def sell_start(message: Message):
     async with aiosqlite.connect(DB_PATH) as db:
         await init_user(message.from_user.id, message.from_user.username, message.from_user.full_name, db)
@@ -588,7 +588,7 @@ async def process_sell_amount(message: Message, state: FSMContext):
     await state.clear()
 
 # --- КЕЙСЫ (ЛОГИКА УДАЧИ И ФЕЙКОВ) ---
-@dp.message(F.text == "Кейсы")
+@dp.message(F.text == "💼Кейсы")
 async def show_cases(message: Message):
     async with aiosqlite.connect(DB_PATH) as db:
         await init_user(message.from_user.id, message.from_user.username, message.from_user.full_name, db)
@@ -686,7 +686,7 @@ async def confirm_case_purchase(callback: CallbackQuery):
     await callback.answer()
 
 # --- ДОНАТ (TELEGRAM STARS) ---
-@dp.message(F.text == "Донат")
+@dp.message(F.text == "💳Донат")
 async def donat_start(message: Message, state: FSMContext):
     await message.answer("Введите количество Telegram Stars для доната (не менее 10, число должно делиться на 5 нацело):")
     await state.set_state(TradeState.waiting_for_donate_amount)
