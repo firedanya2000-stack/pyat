@@ -28,7 +28,7 @@ TOKENS_INFO = {
     "eth": {"name": "⟠Ethereum", "price": 1500.0, "init_price": 1500.0, "min": 1000.0, "max": 2000.0},
     "sol": {"name": "🟣Solana", "price": 75.0, "init_price": 75.0, "min": 50.0, "max": 125.0},
     "ltc": {"name": "𝑳Litecoin", "price": 50.0, "init_price": 50.0, "min": 30.0, "max": 70.0},
-    "doge": {"name": "🪙Dogecoin", "price": 0.1, "init_price": 0.1, "min": 0.1, "max": 0.25},
+    "doge": {"name": "Dogecoin", "price": 0.1, "init_price": 0.1, "min": 0.1, "max": 0.25},
     "gold": {"name": "🟡Gold", "price": 4000.0, "init_price": 4000.0, "min": 3750.0, "max": 4250.0},
     "silver": {"name": "⚪Silver", "price": 100.0, "init_price": 100.0, "min": 75.0, "max": 125.0},
 }
@@ -350,7 +350,7 @@ async def admin_take(message: Message):
 async def cmd_start(message: Message):
     async with aiosqlite.connect(DB_PATH) as db:
         await init_user(message.from_user.id, message.from_user.username, message.from_user.full_name, db)
-    await message.answer("Привет!", reply_markup=get_main_keyboard())
+    await message.answer("Приветсвую, начинающий трейдер! Это игровой бот \"Биржа ПЯТАЧОК\", основанный для начального погружения в огромный мир трейдинга. Удачи в начинаниях!", reply_markup=get_main_keyboard())
 
 @dp.message(F.text == "📊Курс токенов")
 async def show_rates(message: Message):
