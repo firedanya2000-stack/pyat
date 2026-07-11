@@ -267,7 +267,7 @@ def get_cases_inline_keyboard():
 
 def get_case_confirm_keyboard(case_key: str):
     return InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="Да", callback_data=f"case_yes_{case_key}"), InlineKeyboardButton(text="Нет", callback_data="case_no")]]
+        inline_keyboard=[[[InlineKeyboardButton(text="Да", callback_data=f"case_yes_{case_key}"), InlineKeyboardButton(text="Нет", callback_data="case_no")]]]
     )
 
 def is_valid_amount(text: str):
@@ -448,9 +448,8 @@ async def admin_change_nick(message: Message):
         await message.answer("Неверный ID")
         return
         
-    # КРИТИЧЕСКАЯ ПРОВЕРКА: Даже ADMIN_ID не может ставить запрещенные ники
     if contains_bad_words(new_nick):
-        await message.answer("❌ Ошибка! Данный никнейм содержит запрещенные слова. Даже администратор не может его установить.")
+        await message.answer("❌ Ошибка! Данный никнейм содержит запрещенные слова.")
         return
         
     async with aiosqlite.connect(DB_PATH) as db:
@@ -471,7 +470,7 @@ async def admin_give(message: Message):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, target_id))
         await db.commit()
-    await message.answer(f"✅ Успешно выдано {amount:g} ПЯТАКОВ.")
+    await message.answer(f"✅ Успешно выдано {amount:g} ПЯТАКОВ пользователю {target_id}.")
 
 @dp.message(Command("take"))
 async def admin_take(message: Message):
@@ -490,6 +489,80 @@ async def admin_take(message: Message):
         await db.execute("UPDATE users SET balance = ? WHERE user_id = ?", (new_balance, target_id))
         await db.commit()
     await message.answer(f"✅ Успешно забрано. Баланс: {new_balance:.2f}")
+
+@dp.message(Command("users"))
+async def admin_users(message: Message):
+    if message.from_user.id != ADMIN_ID: return
+    
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT user_id, nickname, first_name FROM users") as cursor:
+            rows = await cursor.fetchall()
+            
+    if not rows:
+        await message.answer("В базе данных нет пользователей.")
+        return
+        
+    text = "👥 <b>Список всех пользователей:</b>\n\n"
+    for row in rows:
+        uid, nick, fname = row
+        display_name = nick if nick else (fname if fname else "Без имени")
+        text += f"ID: <code>{uid}</code> | Имя: {html.escape(display_name)}\n"
+        
+    # Разбиваем сообщение, если оно больше лимита Telegram (4096 символов)
+    for i in range(0, len(text), 4000):
+        await message.answer(text[i:i+4000], parse_mode="HTML")
+
+@dp.message(Command("delete"))
+async def admin_delete(message: Message):
+    if message.from_user.id != ADMIN_ID: return
+    args = message.text.split()
+    if len(args) != 2:
+        await message.answer("❌ Использование: `/delete {id ТГ}`", parse_mode="Markdown")
+        return
+        
+    try:
+        target_id = int(args[1])
+    except ValueError:
+        await message.answer("❌ ID должен состоять только из цифр.")
+        return
+        
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("DELETE FROM users WHERE user_id = ?", (target_id,))
+        await db.execute("DELETE FROM portfolio WHERE user_id = ?", (target_id,))
+        await db.execute("DELETE FROM used_promocodes WHERE user_id = ?", (target_id,))
+        await db.commit()
+        
+    await message.answer(f"✅ Все данные пользователя <code>{target_id}</code> успешно удалены.", parse_mode="HTML")
+
+@dp.message(Command("set"))
+async def admin_set(message: Message):
+    if message.from_user.id != ADMIN_ID: return
+    args = message.text.split()
+    if len(args) != 3:
+        await message.answer("❌ Использование: `/set {id ТГ} {число}`", parse_mode="Markdown")
+        return
+        
+    try:
+        target_id = int(args[1])
+        amount = float(args[2])
+    except ValueError:
+        await message.answer("❌ ID и количество PTK должны быть числами.")
+        return
+        
+    if amount > 1000000:
+        await message.answer("❌ Ошибка: Максимальное значение — 1 000 000 PTK.")
+        return
+        
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT 1 FROM users WHERE user_id = ?", (target_id,)) as cursor:
+            if not await cursor.fetchone():
+                await message.answer("❌ Ошибка: Пользователь не найден в базе данных.")
+                return
+                
+        await db.execute("UPDATE users SET balance = ? WHERE user_id = ?", (amount, target_id))
+        await db.commit()
+        
+    await message.answer(f"✅ Пользователю <code>{target_id}</code> установлено <b>{amount:g}</b> PTK.", parse_mode="HTML")
 
 # --- СИСТЕМА ДЕНЕЖНЫХ ПЕРЕВОДОВ МЕЖДУ ЮЗЕРАМИ ---
 @dp.message(Command("pay"))
@@ -588,6 +661,10 @@ async def show_rating(message: Message):
     daily_ranking = []
 
     for uid, balance, start_nw, nick, f_name in users_data:
+        # Исключаем админа из обоих рейтингов
+        if uid == ADMIN_ID:
+            continue
+            
         net_worth = balance
         for token, amount in portfolios.get(uid, {}).items():
             if token in TOKENS_INFO:
@@ -596,9 +673,8 @@ async def show_rating(message: Message):
         display_name = html.escape(nick if nick else (f_name if f_name else f"ID {uid}"))
         global_ranking.append((display_name, net_worth))
         
-        if uid != ADMIN_ID:
-            profit = net_worth - (start_nw if start_nw is not None else 100.0)
-            daily_ranking.append((display_name, profit))
+        profit = net_worth - (start_nw if start_nw is not None else 100.0)
+        daily_ranking.append((display_name, profit))
 
     global_ranking.sort(key=lambda x: x[1], reverse=True)
     daily_ranking.sort(key=lambda x: x[1], reverse=True)
